@@ -1,0 +1,67 @@
+# UI helper values and small rendering functions used by app.R.
+
+biovar_choices <- sdm_biovar_choices
+
+`%||%` <- function(x, y) {
+  if (is.null(x)) y else x
+}
+
+extent_from_inputs <- function(input, occurrence = NULL) {
+  switch(input$extent_preset,
+         occurrence = if (!is.null(occurrence) && !is.null(occurrence$occ)) make_training_extent(occurrence$occ, buffer = 1) else sdm_default_projection_extent,
+         aus_full = sdm_extent_presets$aus_full,
+         aus_north = sdm_extent_presets$aus_north,
+         aus_east = sdm_extent_presets$aus_east,
+         custom = c(input$xmin, input$xmax, input$ymin, input$ymax),
+         sdm_default_projection_extent)
+}
+
+fmt_num <- function(x, digits = 0) {
+  if (length(x) == 0 || is.null(x) || !is.finite(x)) return("-")
+  format(round(x, digits), big.mark = ",", nsmall = digits)
+}
+
+metric_card <- function(label, value, note = NULL) {
+  div(class = "metric-card", div(class = "metric-label", label), div(class = "metric-value", value), if (!is.null(note)) div(class = "metric-note", note))
+}
+
+infer_species_label <- function(path) {
+  if (is.null(path) || length(path) == 0 || is.na(path[1]) || !file.exists(path[1])) return(NA_character_)
+  path <- path[1]
+  quiet_log <- function(message) invisible(NULL)
+  raw <- tryCatch(read_occurrence_file(path, log_fun = quiet_log), error = function(e) NULL)
+  if (is.null(raw) || nrow(raw) == 0) return(NA_character_)
+  species_col <- detect_column(names(raw), c("^(species|scientificname|taxon)$", "scientific.*name", "taxon.*name"))
+  if (is.na(species_col)) return(NA_character_)
+  values <- trimws(as.character(raw[[species_col]]))
+  values <- values[!is.na(values) & nzchar(values) & values != "NA"]
+  if (length(values) == 0) return(NA_character_)
+  counts <- sort(table(values), decreasing = TRUE)
+  top <- names(counts)[1]
+  if (length(top) == 0 || as.numeric(counts[1]) / length(values) < 0.6) return(NA_character_)
+  top
+}
+
+default_species_label <- function(path = sdm_default_occurrence_file) {
+  inferred <- infer_species_label(path)
+  if (!is.na(inferred) && nzchar(inferred)) inferred else sdm_default_species
+}
+
+clean_occurrence_preview <- function(path, min_source_records = sdm_default_min_source_records) {
+  quiet_log <- function(message) invisible(NULL)
+  tryCatch(clean_occurrences(path, min_source_records = min_source_records, merge_small_sources = TRUE, log_fun = quiet_log), error = function(e) list(error = conditionMessage(e)))
+}
+
+occurrence_extent_overlap <- function(occ, extent) {
+  if (is.null(occ) || nrow(occ) == 0 || length(extent) != 4 || any(!is.finite(extent))) return(NULL)
+  inside <- occ$longitude >= extent[1] & occ$longitude <= extent[2] & occ$latitude >= extent[3] & occ$latitude <= extent[4]
+  list(count = sum(inside, na.rm = TRUE), total = nrow(occ), percent = 100 * sum(inside, na.rm = TRUE) / nrow(occ))
+}
+
+placeholder_plot <- function(message) {
+  plot.new()
+  text(0.5, 0.55, message, cex = 1.1, col = "grey35")
+  text(0.5, 0.46, "Configure options on the left, then click Run SDM.", cex = 0.9, col = "grey55")
+}
+
+opentopo_key_is_configured <- function() nzchar(Sys.getenv("OPENTOPOGRAPHY_API_KEY", unset = ""))

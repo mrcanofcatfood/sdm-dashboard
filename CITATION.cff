@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "SDM Dashboard Workbench"
+type: software
+authors:
+  - name: "SDM Dashboard Workbench contributors"
+abstract: "A local R/Shiny workbench for species distribution modelling from presence-only occurrence records with climate, elevation, and soil covariates."
+license: MIT
+repository-code: "https://github.com/5p00kyy/sdm-dashboard"
+date-released: "2026-04-30"
+version: "0.1.0-beta"
+keywords:
+  - species distribution modelling
+  - Shiny
+  - R
+  - geospatial
+  - ecological modelling

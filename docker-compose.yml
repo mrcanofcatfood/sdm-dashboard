@@ -1,0 +1,13 @@
+services:
+  sdm-dashboard:
+    build: .
+    ports:
+      - "3838:3838"
+    environment:
+      PORT: "3838"
+      # OPENTOPOGRAPHY_API_KEY: "set-in-your-shell-or-compose-override"
+    volumes:
+      - ./outputs:/srv/sdm-dashboard/outputs
+      - ./Worldclim:/srv/sdm-dashboard/Worldclim
+      - ./covariates:/srv/sdm-dashboard/covariates
+    restart: unless-stopped
