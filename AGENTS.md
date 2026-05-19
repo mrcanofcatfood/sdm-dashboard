@@ -97,6 +97,7 @@ hostname -I | awk '{print $1}'
 ## Commit and PR cadence
 
 ### Local commits
+- All commits go to `dev` unless explicitly told otherwise. Only merge into `main` via PR.
 - Commit at logical checkpoints: a feature working, a bug fixed, a refactor complete, a test passing.
 - Avoid committing broken states to `dev` or `main`. WIP goes on a feature branch.
 - Use conventional commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`.
