@@ -94,6 +94,26 @@ hostname -I | awk '{print $1}'
 - `R/download_helper.R` — background download helper with polling/verification
 - `R/app_helpers.R` — `fmt_num()`, `safe_numeric()`, `metric_card()`, extent helpers
 
+## Commit and PR cadence
+
+### Local commits
+- Commit at logical checkpoints: a feature working, a bug fixed, a refactor complete, a test passing.
+- Avoid committing broken states to `dev` or `main`. WIP goes on a feature branch.
+- Use conventional commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`.
+- A good rule of thumb: if you'd want to undo it later without hunting through a massive diff, it's a commit.
+
+### Pushing
+- Push feature branches when you want a backup or are ready for review.
+- Push `dev` after merging a feature branch.
+
+### PRs
+- **Feature → `dev`:** one PR per feature/fix. Use the PR checklist below.
+- **`dev` → `main`:** when `dev` is stable, tested, and represents a coherent release state.
+- Smoke test and parse check must pass before requesting review.
+
+### Tags
+- Tag `main` with a semver version (`v1.1.0`, etc.) each time `dev` merges in.
+
 ## PR Checklist Template
 
 Use this in every PR description:
